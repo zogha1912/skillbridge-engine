@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.env.backup*
+.neon
+node_modules/
+.env.local
+
+# Private planning docs (kept locally, never published)
+docs/01-business-model.md
+docs/03-product-roadmap.md
