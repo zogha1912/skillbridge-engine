@@ -4,7 +4,7 @@ A privacy-first career positioning platform for people moving into modern tech r
 
 Instead of matching keywords, SkillBridge compares a candidate's skills with **standardized role profiles** (ESCO and O*NET) and shows the exact gap, the **Skill Delta**. Candidates can also keep a private **Anti-Resume**: tasks, workflows and technologies they refuse to work on. Roles that clash with it are ranked down or removed from their roadmap.
 
-> 🚧 **Status: early development (Phase 1, infrastructure).** The API skeleton, database layer and first schema are in place. Taxonomy import is next.
+> 🚧 **Status: early development (Phase 1, taxonomy import).** API skeleton, database layer and schema are in place. O*NET 31.0 and the official ESCO–O*NET crosswalk are imported; ESCO import is next.
 
 ## Core ideas
 
@@ -47,6 +47,8 @@ cp .env.example .env          # then fill in DATABASE_URL and DATABASE_URL_UNPOO
 python -m scripts.check_db    # connection + pgvector check
 alembic upgrade head          # create the schema
 python -m scripts.smoke_test_db
+python -m etl.onet_import       # O*NET 31.0, ICT roles (add --scope all for every role)
+python -m etl.crosswalk_import  # official ESCO <-> O*NET occupation mapping
 pytest
 
 uvicorn app.main:app --reload # http://127.0.0.1:8000/health and /docs
@@ -64,4 +66,6 @@ docs/         Architecture and security documentation
 
 ## Data sources
 
-This project uses the ESCO classification of the European Commission and the O*NET database of the US Department of Labor. Attribution will be shown in the app once taxonomy data is imported.
+This project includes information from the **O*NET 31.0 Database** by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). Used under the [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) license. O*NET® is a trademark of USDOL/ETA. SkillBridge has modified all or some of this information. USDOL/ETA has not approved, endorsed, or tested these modifications.
+
+It also uses the **ESCO** classification of the European Commission and the official ESCO–O*NET occupation crosswalk. The source data is downloaded by the import scripts and is not stored in this repository.

@@ -12,3 +12,6 @@ node_modules/
 # Private planning docs (kept locally, never published)
 docs/01-business-model.md
 docs/03-product-roadmap.md
+
+# Downloaded source data (large, re-downloadable)
+data/

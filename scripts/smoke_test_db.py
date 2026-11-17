@@ -27,7 +27,9 @@ async def main() -> int:
 
     try:
         async with AsyncSessionLocal() as session:
-            session.add(Skill(preferred_label=marker, skill_type="smoke-test", embedding=target))
+            session.add(
+                Skill(source="onet", external_id=marker, preferred_label=marker, skill_type="smoke-test", embedding=target)
+            )
             await session.commit()
         print(f"1. inserted skill '{marker}' with a {EMBEDDING_DIM}-d embedding")
 
