@@ -136,7 +136,7 @@ Gemini embeddings are requested at **768 dimensions** (`EMBEDDING_DIM` in [`app/
 
 ## 4. Mathematical engine
 
-All formulas live in `app/services/engine/` (Phase 2) as pure Python functions with no database or network calls, so they're easy to test.
+✅ Implemented in [`app/services/engine/scoring.py`](../app/services/engine/scoring.py) as pure Python functions with no database or network calls: `score_role(target, user_skills, anti_resume, similarity, config)` returns Match, the ranked Δ, overlaps, penalty, Final Score and the pruning flag. Similarity is passed in as a function, so the app can back it with pgvector and tests with a table. A role with no skills scores 0 and is pruned. Tests: [`tests/test_scoring_engine.py`](../tests/test_scoring_engine.py) (worked example below, edge cases, 200 randomized property checks).
 
 ### 4.1 Inputs
 
