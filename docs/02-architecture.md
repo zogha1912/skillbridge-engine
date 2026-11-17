@@ -115,8 +115,8 @@ erDiagram
 
 | Table | Key columns | Phase | Notes |
 |---|---|---|---|
-| `skills` | `id`, `source ∈ {esco, onet}`, `external_id` (UNIQUE with source), `preferred_label`, `description`, `skill_type ∈ {skill, knowledge, technology, …}`, `embedding VECTOR(768)` | ✅ 1 | `external_id`: ESCO URI, O*NET element ID, or `tech:<name>` for O*NET technology examples |
-| `occupations` | `id`, `source`, `external_id` (UNIQUE with source), `code`, `title`, `description`, `embedding VECTOR(768)` | ✅ 1 | Standardized role profiles ($S_{\text{target}}$); one row per source because ESCO ↔ O*NET is many-to-many |
+| `skills` | `id`, `source ∈ {esco, onet}`, `external_id` (UNIQUE with source), `preferred_label`, `alt_labels TEXT[]`, `description`, `skill_type ∈ {skill, knowledge, technology, …}`, `embedding VECTOR(768)` | ✅ 1 | `external_id`: ESCO URI, O*NET element ID, or `tech:<name>` for O*NET technology examples |
+| `occupations` | `id`, `source`, `external_id` (UNIQUE with source), `code`, `title`, `alt_labels TEXT[]`, `description`, `embedding VECTOR(768)` | ✅ 1 | Standardized role profiles ($S_{\text{target}}$); one row per source because ESCO ↔ O*NET is many-to-many |
 | `occupation_skills` | `occupation_id`, `skill_id` (PK), `relation ∈ {essential, optional}`, `importance ∈ [0,1]`, `source ∈ {esco, onet}` | ✅ 1 | Gives skill weights $w_k$ (§4.2) |
 | `occupation_crosswalk` | `onet_soc_code`, `esco_uri` (PK), `match_type` (`exactMatch`, `closeMatch`, `broadMatch`, …) | ✅ 1 | Official ESCO–O*NET mapping, keyed by external IDs |
 | `taxonomy_imports` | `source`, `version`, `scope`, `file_sha256`, `row_counts JSONB`, `imported_at` | ✅ 1 | Provenance of every import (attribution + reproducibility) |
@@ -253,13 +253,15 @@ flowchart LR
 
 | Task | Detail |
 |---|---|
-| ESCO import | ⏳ Bulk CSV (v1.2.1, English), requested by email from the ESCO portal. Start with the ICT/digital subset, then expand |
+| ESCO import | ✅ `python -m etl.esco_import [--scope ict\|all]`. Bulk CSV v1.2.1 (English), requested by email from the ESCO portal and saved as `data/raw/esco/esco_v1.2.1_en_csv.zip`. Uses `occupations_en`, `skills_en` (with `altLabels`), `occupationSkillRelations_en` (essential/optional) and `digitalSkillsCollection_en`. ICT scope = ISCO `25*`, `351*`, `1330` plus all digital skills |
 | O*NET import | ✅ `python -m etl.onet_import [--scope ict\|all]`. O*NET 31.0 text zip (downloaded automatically). Uses `Occupation Data`, `Knowledge`, `Essential Skills`, `Transferable Skills` (importance scale `IM`, 1–5 rescaled to 0..1; rows below 2.5, suppressed or "not relevant" dropped; ≥ 3.5 = essential) and `Software Skills` (technology examples, linked as optional). ICT scope = SOC `15-*`, `11-3021`, `17-2061` |
 | Cross-link | ✅ `python -m etl.crosswalk_import`. Official ESCO–O*NET occupation crosswalk (ESCO Secretariat + USDOL/ETA, v1, Sep 2022); rows pointing at ISCO groups are skipped |
 | Embed | Only rows whose text hash changed; batched; 768 dimensions |
 | Upsert | `INSERT ... ON CONFLICT (esco_uri / onet_element_id) DO UPDATE` |
 
 Attribution for ESCO and O*NET is shown in the UI footer and the API docs. Required O*NET wording: *"This page includes information from the O*NET 31.0 Database by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). Used under the CC BY 4.0 license. O*NET® is a trademark of USDOL/ETA."* Because the importer filters and rescales the data, also add: *"SkillBridge has modified all or some of this information. USDOL/ETA has not approved, endorsed, or tested these modifications."*
+
+ESCO is reusable for any purpose under Commission Decision 2011/833/EU. Required wording: *"This service uses the ESCO classification of the European Commission."* (linked to https://ec.europa.eu/esco), and *"Any modified or adapted version of ESCO must be clearly indicated as such"*, so also state that the data is filtered and restructured. Do not use EU logos or imply EU endorsement.
 
 Importers are idempotent (upserts on `(source, external_id)`), so re-running them is safe; each run adds a `taxonomy_imports` row.
 

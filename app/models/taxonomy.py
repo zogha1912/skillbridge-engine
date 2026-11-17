@@ -15,7 +15,7 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -47,6 +47,7 @@ class Skill(TimestampMixin, Base):
     source: Mapped[str] = mapped_column(String(8), nullable=False)
     external_id: Mapped[str] = mapped_column(Text, nullable=False)
     preferred_label: Mapped[str] = mapped_column(Text, nullable=False)
+    alt_labels: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
     description: Mapped[str | None] = mapped_column(Text)
     skill_type: Mapped[str | None] = mapped_column(String(32))
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
@@ -79,6 +80,7 @@ class Occupation(TimestampMixin, Base):
     external_id: Mapped[str] = mapped_column(Text, nullable=False)
     code: Mapped[str | None] = mapped_column(String(16), index=True)
     title: Mapped[str] = mapped_column(Text, nullable=False)
+    alt_labels: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
     description: Mapped[str | None] = mapped_column(Text)
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
 
