@@ -51,6 +51,7 @@ class Skill(TimestampMixin, Base):
     description: Mapped[str | None] = mapped_column(Text)
     skill_type: Mapped[str | None] = mapped_column(String(32))
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
+    embedding_hash: Mapped[str | None] = mapped_column(String(64))  # see etl/embed.py
 
     occupations: Mapped[list["OccupationSkill"]] = relationship(back_populates="skill")
 
@@ -83,6 +84,7 @@ class Occupation(TimestampMixin, Base):
     alt_labels: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
     description: Mapped[str | None] = mapped_column(Text)
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
+    embedding_hash: Mapped[str | None] = mapped_column(String(64))  # see etl/embed.py
 
     skills: Mapped[list["OccupationSkill"]] = relationship(back_populates="occupation")
 

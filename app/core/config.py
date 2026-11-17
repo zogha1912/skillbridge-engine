@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     db_echo: bool = False
 
     gemini_api_key: SecretStr | None = None
+    gemini_embedding_model: str = "gemini-embedding-2"
 
 
 @lru_cache
