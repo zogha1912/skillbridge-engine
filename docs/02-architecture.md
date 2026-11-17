@@ -232,6 +232,15 @@ The candidate has {Python, SQL, Docker}. Their Anti-Resume holds: *COBOL* (hard)
 
 ## 6. ETL with Airflow
 
+### 6.0 Decision (2026-11-17): Airflow deferred, lightweight pipeline runner instead
+Measured on the development laptop: 7.9 GB RAM with only ~1.4 GB free during normal work, 1.5 GB already compressed and 1.6 GB in the pagefile. WSL2 plus the Airflow scheduler and web UI would need roughly 2–3 GB, which would push the machine into heavy swapping. Airflow would add little: every step is idempotent and logged in `taxonomy_imports`.
+
+Instead:
+- **`python -m etl.pipeline`** runs ESCO → O*NET → crosswalk → embeddings in order and stops at the first failure (`--only`, `--skip`, `--scope`). Exit code 2 means the Gemini daily quota stopped the embeddings; re-run after the reset.
+- **`scripts/daily_embed.cmd`** runs the embedding step and appends to `data/logs/embed.log`. It's meant for a daily Windows scheduled task while the free-tier quota (1,000 texts/day) limits embedding.
+
+Revisit Airflow (or a managed scheduler) when the pipeline runs on a server instead of this laptop. The notes below apply then.
+
 ### 6.1 Running Airflow on an 8 GB Windows laptop
 - Airflow does **not** support native Windows. Install it in a Python venv **inside WSL2 (Ubuntu)**. That's still a plain venv, with no Docker.
 - Cap WSL2's memory in `%UserProfile%\.wslconfig`, for example `[wsl2]` then `memory=3GB`.

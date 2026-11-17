@@ -22,7 +22,7 @@ Full details: [docs/00-master-architecture.md](docs/00-master-architecture.md) a
 - **API:** FastAPI (async) with Pydantic v2
 - **Database:** PostgreSQL with pgvector on [Neon](https://neon.com); SQLAlchemy 2 (async) + asyncpg; Alembic migrations
 - **AI:** Google Gemini API for structured extraction and embeddings
-- **Data pipeline:** Apache Airflow (planned)
+- **Data pipeline:** idempotent import scripts run by `python -m etl.pipeline` (Airflow deferred; see docs)
 - **Taxonomies:** ESCO (European Commission) and O*NET (US Department of Labor)
 
 ## Privacy by design
@@ -50,6 +50,7 @@ python -m scripts.smoke_test_db
 python -m etl.esco_import       # ESCO v1.2.1 CSV zip, requested from the ESCO download page
 python -m etl.onet_import       # O*NET 31.0, ICT roles (add --scope all for every role)
 python -m etl.crosswalk_import  # official ESCO <-> O*NET occupation mapping
+python -m etl.pipeline         # or run all import + embedding steps in order
 pytest
 
 uvicorn app.main:app --reload # http://127.0.0.1:8000/health and /docs

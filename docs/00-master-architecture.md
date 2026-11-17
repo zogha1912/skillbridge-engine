@@ -69,3 +69,4 @@ Both also publish **bulk downloads**, which the ETL prefers over per-item API ca
 | Rule 2: "never sent to the LLM" | Keeps Anti-Resume content out of third-party processing |
 | Streamlit UI hosted on Streamlit Community Cloud | Vercel hosts JS frontends; it doesn't run Streamlit apps |
 | Typo "Personably" → "Personally" | |
+| 2026-11-17: Airflow deferred; `python -m etl.pipeline` runs the ETL steps instead | Measured only ~1.4 GB free RAM; WSL2 + Airflow needs ~2–3 GB. Revisit when the pipeline moves to a server (see 02-architecture §6.0) |
